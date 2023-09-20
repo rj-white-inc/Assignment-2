@@ -1,20 +1,18 @@
 public class Driver {
-	
-	public main(){
+    public static void main() {
+        // Create a button
+        Button button = new Button();
 
-	// create a button
+        // Create lights
+        Light redLight = new Light("red");
+        Light greenLight = new Light("green");
+        Light blueLight = new Light("blue");
 
-	// create a red light
+        // Have the blue light and the red light listen for the button
+        button.addObserver(blueLight);
+        button.addObserver(redLight);
 
-	// create a green light
-
-	// create a blue light
-
-	// have the blue light and the red light listen for the button
-
-	// press the button. Blue and red light should call turnOn in response
-	// NOTE: your Button class should be generic - do not hard-code these 
-	// lights into the Button class.
-
-	}
+        // Press the button. Blue and red light should call turnOn in response
+        button.press();
+    }
 }
