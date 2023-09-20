@@ -1,41 +1,93 @@
-// get registration information from the user
-$username = $_POST['username'];
-$pw1 = $_POST['password1'];
-$pw2 = $_POST['password2'];
+class UserModel {
+    private $db;
 
-// validate 
-if ($pw1 != $pw2 || !valid($pw1) || !valid($username))
-    return redirectBack(400);
+    /** CHANGE: Moved database initialization to the model. **/
+    public function __construct($db) {
+        $this->db = $db;
+    }
 
-// hash password
-$pwHash = hash($pw1);
+    /** CHANGE: Extracted registration logic to the model. **/
+    public function register($username, $pwHash) {
+        $table = "users";
+        return $this->db->query("INSERT INTO $table (username, password) 
+            VALUES ($username, $pwHash);");
+    }
 
-$title = "<title>Welcome $username</title>";
+    /** CHANGE: Added validation logic to the model. **/
+    public function valid($input) {
+        // validation logic
+        return true; // or false
+    }
 
-// initialize database
+    /** CHANGE: Moved password hashing to the model. **/
+    public function hashPassword($password) {
+        return hash($password);
+    }
+}
+
+class UserView {
+    /** CHANGE: Moved UI display logic to the view. **/
+    public function render($username) {
+        $title = "<title>Welcome $username</title>";
+        $h1Style = getCurrentSeason() == 'summer' 
+                    ? '<h1 style="color: RED">' 
+                    : '<h1 style="color: BLUE">';
+        
+        echo "<html>
+                    <head>
+                        $title
+                    </head>
+                    <body>
+                        $h1Style
+                            Welcome $username
+                        </h1>
+                    </body>
+              </html>";
+    }
+
+    /** CHANGE: Moved redirection logic to the view. **/
+    public function redirectBack($statusCode) {
+        // redirection logic based on status code
+    }
+}
+
+class UserController {
+    private $model;
+    private $view;
+
+    /** CHANGE: Initialized model and view in the controller. **/
+    public function __construct($model, $view) {
+        $this->model = $model;
+        $this->view = $view;
+    }
+
+    /** CHANGE: Moved user registration logic to the controller. **/
+    public function register() {
+        $username = $_POST['username'];
+        $pw1 = $_POST['password1'];
+        $pw2 = $_POST['password2'];
+
+        if ($pw1 != $pw2 || !$this->model->valid($pw1) || !$this->model->valid($username)) {
+            $this->view->redirectBack(400);
+            return;
+        }
+
+        $pwHash = $this->model->hashPassword($pw1);
+        $success = $this->model->register($username, $pwHash);
+
+        if (!$success) {
+            $this->view->redirectBack(500);
+            return;
+        }
+
+        $this->view->render($username);
+    }
+}
+
+/** CHANGE: Main section to initialize and tie together MVC components. **/
 $db = getDatabase('myHost', 'mypassword', 'myDb');
-$table = "users";
+$model = new UserModel($db);
+$view = new UserView();
+$controller = new UserController($model, $view);
 
-// create user
-$success = $db->query("INSERT INTO $table (username, password) 
-    VALUES ($username, $pwHash);");
-
-if(!$success)
-    return redirectBack(500);
-
-// set up opening tag 
-if(getCurrentSeason() == 'summer');
-    $h1Style = '<h1 style="color: RED">';
-else
-    $h1Style = '<h1 style="color: BLUE">';
-
-echo "<html>
-            <head>
-                $title
-            </head>
-            <body>
-                $h1Style
-                    Welcome $username
-                </h1>
-            </body>
-        </html>";
+$controller->register();
