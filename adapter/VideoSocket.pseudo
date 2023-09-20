@@ -3,6 +3,22 @@
 // still must use a VidePlug (i.e., don't just replace
 // plug with an HDMIPlug object.
 
+/** CHANGE: Adapter class to bridge the interface between HDMIPlug and VideoPlug **/
+public class HDMIAdapter implements VideoPlug {
+    // Encapsulate the HDMIPlug
+    private HDMIPlug hdmiPlug;
+
+    // Constructor
+    public HDMIAdapter() {
+        this.hdmiPlug = new HDMIPlug();
+    }
+
+    // Implement the VideoPlug's display method using HDMIPlug's digitalDisplay method
+    @Override
+    public void display(int width, int height) {
+        hdmiPlug.digitalDisplay();
+    }
+}
 public class VideoSocket {
 
 	public main(){
