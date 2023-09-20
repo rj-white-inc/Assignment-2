@@ -1,11 +1,22 @@
+/** CHANGE: Implemented the Singleton pattern **/
 public class Logger {
-	private String log;
-	// Constructor
-	public Logger(){
-	}
+    private static Logger instance = null;
+    private String log;
 
-	// Log something
-	public info(String information){
-		this.log.append(information);
-	}
+    /** CHANGE: Made the constructor private to prevent outside instantiation **/
+    private Logger(){
+        this.log = "";
+    }
+
+    /** CHANGE: Static method to return the single instance of Logger **/
+    public static Logger getInstance() {
+        if (instance == null) {
+            instance = new Logger();
+        }
+        return instance;
+    }
+
+    public void info(String information) {
+        this.log += information; // Corrected the 'append' method to the '+=' operation for pseudocode clarity
+    }
 }
