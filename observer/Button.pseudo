@@ -1,6 +1,22 @@
+/** CHANGE: Button now acts as the Subject **/
 public class Button {
+    private List<Observer> observers = new ArrayList<>();
 
-	public void press() {
-		
-	}
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    public void press() {
+        notifyObservers();
+    }
+
+    private void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update();
+        }
+    }
 }
